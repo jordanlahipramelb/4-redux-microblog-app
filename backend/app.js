@@ -16,23 +16,19 @@ app.use("/api/posts/:post_id/comments", postCommentsRoutes);
 app.use("/api/posts", postsRoutes);
 
 
-/** 404 Not Found handler. */
-
+/** 404 handler: matches unmatched routes; raises NotFoundError. */
 app.use(function (req, res, next) {
-  const err = new Error("Not Found");
-  err.status = 404;
-  next(err);
+  return next(new NotFoundError());
 });
 
-/** Generic error handler. */
-
+/** Error handler: logs stacktrace and returns JSON error message. */
 app.use(function (err, req, res, next) {
-  if (err.stack) console.error(err.stack);
-
-  res.status(err.status || 500).json({
-    message: err.message,
-  });
+  const status = err.status || 500;
+  const message = err.message;
+  if (process.env.NODE_ENV !== "test") console.error(status, err.stack);
+  return res.status(status).json({ error: { message, status } });
 });
+
 
 
 module.exports = app;

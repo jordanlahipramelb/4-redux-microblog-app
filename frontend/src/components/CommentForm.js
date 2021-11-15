@@ -22,15 +22,17 @@ const CommentForm = ({ addComment }) => {
   return (
     <div className="CommentForm">
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="text"
-          size="40"
-          placeholder="New Comment"
-          className="form-control"
-          value={text}
-          onChange={handleChange}
-        />
+        <div className="form-group">
+          <input
+            type="text"
+            name="text"
+            size="40"
+            placeholder="New Comment"
+            className="form-control"
+            value={comment}
+            onChange={handleChange}
+          />
+        </div>
         <button className="btn btn-primary">Add</button>
       </form>
     </div>

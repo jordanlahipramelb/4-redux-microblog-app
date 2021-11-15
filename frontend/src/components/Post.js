@@ -1,12 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import "../css/Post.css";
 
 import PostView from "./PostView";
 import PostForm from "./PostForm";
 import CommentList from "./CommentList";
+import CommentForm from "./CommentForm";
+
+import {
+  getPostFromAPI,
+  removeCommentFromAPI,
+  removePostFromAPI,
+  sendCommentToAPI,
+  sendVoteToAPI,
+  updatePostInAPI,
+} from "../actions/posts";
 
 /** Post Component
+ *
+ * A component that gets the post data from Redux, and decides, from its own state, whether to show the edit form or the simple PostDisplay component.
+ * This also handles editing, deleting, comment-adding, and comment-deleting.
+ *
  *
  * Parent for
  * - PostForm
@@ -20,6 +35,20 @@ const Post = () => {
   const postId = Number(useParams().postId);
   const [isEditing, setIsEditing] = useState(false);
   const post = useSelector((state) => state.posts[postId]);
+  const dispatch = useDispatch();
+
+  /** Request post from API via postId */
+
+  useEffect(() => {
+    const getPost = async () => {
+      dispatch(getPostFromAPI(postId));
+    };
+
+    // calls function if no post is present
+    if (!post) {
+      getPost();
+    }
+  }, [dispatch, postId, post]);
 
   /** Toggles editing post on/off */
 
@@ -27,23 +56,39 @@ const Post = () => {
     setIsEditing((editting) => !editting);
   };
 
+  /** Handles editing a post; updates in backend */
+
   const edit = ({ title, body, description }) => {
+    dispatch(updatePostInAPI(postId, title, description, body));
+
     toggleEdit();
   };
 
   /** Handles deleting a post */
 
   const deletePost = () => {
+    dispatch(removePostFromAPI(postId));
+
     history.push("/");
   };
 
   /** Handles adding a comment */
 
-  const addComment = (text) => {};
+  const addComment = (text) => {
+    dispatch(sendCommentToAPI(postId, text));
+  };
 
-  /** Handles deleting a comment via id */
+  /** Handles deleting a comment via comment id */
 
-  const deleteComment = (id) => {};
+  const deleteComment = (commentId) => {
+    dispatch(removeCommentFromAPI(postId, commentId));
+  };
+
+  /** Handle voting in the backend */
+
+  const vote = (direction) => {
+    dispatch(sendVoteToAPI(postId, direction));
+  };
 
   if (!post)
     return (
@@ -53,13 +98,19 @@ const Post = () => {
     );
 
   return (
-    <div className="Post">
+    <div className="Post container">
+      {/* Decide whether to show the edit form if toggleEdit is true, or the simple PostView component */}
       {isEditing ? (
-        //   displays of toggleEdit button is clicked
         <PostForm post={post} save={edit} cancel={toggleEdit} />
       ) : (
-        <PostView post={post} toggleEdit={toggleEdit} deletePost={deletePost} />
+        <PostView
+          post={post}
+          toggleEdit={toggleEdit}
+          deletePost={deletePost}
+          handleVote={vote}
+        />
       )}
+
       <div className="Post-comments mb-3">
         <h4>Comments</h4>
         <CommentList comments={post.comments} deleteComment={deleteComment} />

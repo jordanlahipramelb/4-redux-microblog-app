@@ -3,7 +3,7 @@ import { Switch, Redirect, Route } from "react-router-dom";
 
 import Homepage from "./components/Homepage";
 import NewPost from "./components/NewPost";
-import PostView from "./components/PostView";
+import Post from "./components/Post";
 
 const Routes = () => {
   return (
@@ -15,7 +15,7 @@ const Routes = () => {
         <Homepage />
       </Route>
       <Route path="/:postId" exact>
-        <PostView />
+        <Post />
       </Route>
       <Redirect to="/" />
     </Switch>

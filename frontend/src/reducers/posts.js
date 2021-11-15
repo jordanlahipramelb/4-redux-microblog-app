@@ -1,4 +1,5 @@
 import {
+  FETCH_POST,
   ADD_POST,
   REMOVE_POST,
   UPDATE_POST,
@@ -25,7 +26,7 @@ export default function rootReducer(state = {}, action) {
         },
       };
 
-    //  delete the state of posts
+    //  delete the state of posts with the postId
     case REMOVE_POST:
       let posts = { ...state };
       delete posts[action.postId];
